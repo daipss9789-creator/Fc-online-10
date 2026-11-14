@@ -1,0 +1,829 @@
+{
+  "entities": {
+    "UserSave": {
+      "title": "UserSave",
+      "description": "Private manager progression, currency balances, VIP points, competitive ranking telemetry, pack counts, milestone claims, and admin moderation metadata.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the owning manager.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "managerName": {
+          "type": "string",
+          "description": "Display name of the FC Online manager (HLV).",
+          "minLength": 2,
+          "maxLength": 32
+        },
+        "deviceLabel": {
+          "type": "string",
+          "description": "Non-PII platform/device label.",
+          "minLength": 2,
+          "maxLength": 40
+        },
+        "fc": {
+          "type": "integer",
+          "description": "FC premium currency balance."
+        },
+        "bp": {
+          "type": "number",
+          "description": "BP transfer market currency balance."
+        },
+        "starPoints": {
+          "type": "integer",
+          "description": "Star Point (Tarpoi / Điểm Sao) currency balance for Shop Tarpoi."
+        },
+        "nextCardSerial": {
+          "type": "integer",
+          "description": "Next sequential card serial counter (#0001+) for INFINITY_PRIME and LE seasons."
+        },
+        "vipPoints": {
+          "type": "integer",
+          "description": "Cumulative VIP points earned from SVIP progression."
+        },
+        "vipLevel": {
+          "type": "integer",
+          "description": "Calculated VIP tier from 0 to 20."
+        },
+        "foosballLoops": {
+          "type": "integer",
+          "description": "Available Bi Lac event loops counter (bounded 0..1000000)."
+        },
+        "foosballSpins": {
+          "type": "integer",
+          "description": "Cumulative Bi Lac event points/spins counter toward milestone 10000."
+        },
+        "foosballJackpotFc": {
+          "type": "integer",
+          "description": "Progressive Jackpot pot from 100 FC to 1000000 FC."
+        },
+        "squadValue": {
+          "type": "number",
+          "description": "Total squad value in BP."
+        },
+        "bestCardOvr": {
+          "type": "integer",
+          "description": "Highest effective OVR among owned player cards."
+        },
+        "bestCardName": {
+          "type": "string",
+          "description": "Name of the highest OVR player card.",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "bestCardSeason": {
+          "type": "string",
+          "description": "Season code of the highest OVR card.",
+          "minLength": 1,
+          "maxLength": 16
+        },
+        "bestCardGrade": {
+          "type": "integer",
+          "description": "Enhancement grade (+1 to +13) of the highest OVR card."
+        },
+        "elo": {
+          "type": "integer",
+          "description": "Official Ranked 1vs1 / GLXH rating points (1000 to 10000)."
+        },
+        "wins": {
+          "type": "integer",
+          "description": "Cumulative competitive match wins."
+        },
+        "draws": {
+          "type": "integer",
+          "description": "Cumulative competitive match draws."
+        },
+        "losses": {
+          "type": "integer",
+          "description": "Cumulative competitive match losses."
+        },
+        "managerXp": {
+          "type": "integer",
+          "description": "Cumulative Manager XP used to compute Manager Level 1..100."
+        },
+        "squadOvr": {
+          "type": "integer",
+          "description": "Starting XI boosted overall rating (0 to 300)."
+        },
+        "claimedBroadcastIds": {
+          "type": "array",
+          "description": "Bounded list (max 50) of claimed global server broadcast gift IDs."
+        },
+        "packs": {
+          "type": "object",
+          "description": "Bounded map of pack template IDs to integer quantities."
+        },
+        "claimedMilestones": {
+          "type": "array",
+          "description": "Bounded list of claimed Bi Lac spin milestone thresholds."
+        },
+        "claimedVipRewards": {
+          "type": "array",
+          "description": "Bounded list of claimed VIP level reward tiers."
+        },
+        "formation": {
+          "type": "string",
+          "description": "Selected tactical formation code (22 official FC Online formations).",
+          "minLength": 5,
+          "maxLength": 16,
+          "pattern": "^[a-zA-Z0-9\\-]+$"
+        },
+        "activeTeamColorId": {
+          "type": "string",
+          "description": "Selected primary Team Color identifier or auto.",
+          "minLength": 2,
+          "maxLength": 48,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "lineupSlotUids": {
+          "type": "array",
+          "description": "Bounded list (max 11) of card UIDs placed in starting lineup tactical slots."
+        },
+        "isBanned": {
+          "type": "boolean",
+          "description": "Admin-enforced account suspension flag."
+        },
+        "banReason": {
+          "type": "string",
+          "description": "Optional suspension reason set by Administrator.",
+          "minLength": 0,
+          "maxLength": 100
+        },
+        "isDelegatedAdmin": {
+          "type": "boolean",
+          "description": "Admin-delegated game control privilege flag."
+        },
+        "adminRevision": {
+          "type": "integer",
+          "description": "Monotonic revision counter incremented on Administrator account edits."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": [
+        "ownerId",
+        "managerName",
+        "fc",
+        "bp",
+        "vipPoints",
+        "vipLevel",
+        "foosballLoops",
+        "foosballSpins",
+        "foosballJackpotFc",
+        "squadValue",
+        "bestCardOvr",
+        "bestCardName",
+        "bestCardSeason",
+        "bestCardGrade",
+        "packs",
+        "claimedMilestones",
+        "claimedVipRewards",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "PlayerCardDoc": {
+      "title": "PlayerCardDoc",
+      "description": "Individual player card owned by a manager in their club inventory.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the card owner.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "templateId": {
+          "type": "string",
+          "description": "Static player card template identifier.",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "grade": {
+          "type": "integer",
+          "description": "Enhancement grade from 1 to 13."
+        },
+        "ovr": {
+          "type": "integer",
+          "description": "Effective overall rating of the card."
+        },
+        "valueBp": {
+          "type": "number",
+          "description": "Current BP valuation of the card."
+        },
+        "customMinifaceUrl": {
+          "type": "string",
+          "description": "Optional Locker Room equipped background-free miniface asset path or custom mobile portrait Data URL.",
+          "minLength": 14,
+          "maxLength": 160000,
+          "pattern": "^(/minifaces/[a-zA-Z0-9_\\-]+\\.png|data:image/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+)$"
+        },
+        "serialNumber": {
+          "type": "integer",
+          "description": "Optional sequential pull serial number (#0001+) strictly for INFINITY_PRIME and LE cards."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": [
+        "ownerId",
+        "templateId",
+        "grade",
+        "ovr",
+        "valueBp",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "CloudManagedAccountDoc": {
+      "title": "CloudManagedAccountDoc",
+      "description": "Cross-web and cross-device non-PII game account state synchronized via Firestore so the Administrator can inspect and edit accounts across different web URLs and devices.",
+      "type": "object",
+      "properties": {
+        "accountId": {
+          "type": "string",
+          "description": "Sanitized cross-web account identifier (e.g. local_hlv1, guest_abc, cloud_uid).",
+          "minLength": 2,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "syncScope": {
+          "type": "string",
+          "description": "Global cross-web partition key.",
+          "enum": ["GLOBAL"],
+          "minLength": 6,
+          "maxLength": 6
+        },
+        "authMode": {
+          "type": "string",
+          "description": "Account authentication mode without storing PII.",
+          "enum": ["local", "guest", "firebase"],
+          "minLength": 5,
+          "maxLength": 8
+        },
+        "managerName": {
+          "type": "string",
+          "description": "Display name of the manager (HLV).",
+          "minLength": 2,
+          "maxLength": 32
+        },
+        "deviceLabel": {
+          "type": "string",
+          "description": "Non-PII platform/device label.",
+          "minLength": 2,
+          "maxLength": 40
+        },
+        "fc": {
+          "type": "integer",
+          "description": "FC balance."
+        },
+        "bp": {
+          "type": "number",
+          "description": "BP balance."
+        },
+        "starPoints": {
+          "type": "integer",
+          "description": "Star Points (Tarpoi) balance."
+        },
+        "nextCardSerial": {
+          "type": "integer",
+          "description": "Next sequential card serial counter."
+        },
+        "vipPoints": {
+          "type": "integer",
+          "description": "Cumulative VIP points."
+        },
+        "vipLevel": {
+          "type": "integer",
+          "description": "Calculated SVIP tier from 0 to 20."
+        },
+        "foosballLoops": {
+          "type": "integer",
+          "description": "Available Bi Lac loops."
+        },
+        "foosballSpins": {
+          "type": "integer",
+          "description": "Cumulative Bi Lac points/spins."
+        },
+        "foosballJackpotFc": {
+          "type": "integer",
+          "description": "Progressive Jackpot FC pot."
+        },
+        "squadValue": {
+          "type": "number",
+          "description": "Total squad value in BP."
+        },
+        "bestCardOvr": {
+          "type": "integer",
+          "description": "Highest effective OVR among owned cards."
+        },
+        "bestCardName": {
+          "type": "string",
+          "description": "Name of highest OVR card.",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "bestCardSeason": {
+          "type": "string",
+          "description": "Season code of highest OVR card.",
+          "minLength": 1,
+          "maxLength": 16
+        },
+        "bestCardGrade": {
+          "type": "integer",
+          "description": "Enhancement grade (+1 to +13) of highest OVR card."
+        },
+        "elo": {
+          "type": "integer",
+          "description": "Competitive Ranked Elo rating (1000 to 10000)."
+        },
+        "wins": {
+          "type": "integer",
+          "description": "Competitive match wins."
+        },
+        "draws": {
+          "type": "integer",
+          "description": "Competitive match draws."
+        },
+        "losses": {
+          "type": "integer",
+          "description": "Competitive match losses."
+        },
+        "managerXp": {
+          "type": "integer",
+          "description": "Cumulative Manager XP."
+        },
+        "squadOvr": {
+          "type": "integer",
+          "description": "Starting XI boosted overall rating (0 to 300)."
+        },
+        "packs": {
+          "type": "object",
+          "description": "Bounded map of pack counts."
+        },
+        "claimedMilestones": {
+          "type": "array",
+          "description": "Bounded list of claimed Bi Lac milestone thresholds."
+        },
+        "claimedVipRewards": {
+          "type": "array",
+          "description": "Bounded list of claimed SVIP reward levels."
+        },
+        "claimedBroadcastIds": {
+          "type": "array",
+          "description": "Bounded list of claimed server broadcast gift IDs."
+        },
+        "formation": {
+          "type": "string",
+          "description": "Selected tactical formation code.",
+          "minLength": 5,
+          "maxLength": 16,
+          "pattern": "^[a-zA-Z0-9\\-]+$"
+        },
+        "activeTeamColorId": {
+          "type": "string",
+          "description": "Selected Team Color identifier.",
+          "minLength": 2,
+          "maxLength": 48,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "lineupSlotUids": {
+          "type": "array",
+          "description": "Bounded list (max 11) of starting XI card UIDs."
+        },
+        "isBanned": {
+          "type": "boolean",
+          "description": "Whether account is suspended by Administrator."
+        },
+        "banReason": {
+          "type": "string",
+          "description": "Suspension reason.",
+          "minLength": 0,
+          "maxLength": 100
+        },
+        "isDelegatedAdmin": {
+          "type": "boolean",
+          "description": "Whether account has delegated admin privilege."
+        },
+        "adminRevision": {
+          "type": "integer",
+          "description": "Monotonic admin mutation counter."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": [
+        "accountId",
+        "syncScope",
+        "authMode",
+        "managerName",
+        "deviceLabel",
+        "fc",
+        "bp",
+        "starPoints",
+        "nextCardSerial",
+        "vipPoints",
+        "vipLevel",
+        "foosballLoops",
+        "foosballSpins",
+        "foosballJackpotFc",
+        "squadValue",
+        "bestCardOvr",
+        "bestCardName",
+        "bestCardSeason",
+        "bestCardGrade",
+        "packs",
+        "claimedMilestones",
+        "claimedVipRewards",
+        "isBanned",
+        "banReason",
+        "isDelegatedAdmin",
+        "adminRevision",
+        "updatedAt"
+      ]
+    },
+    "CloudManagedCardDoc": {
+      "title": "CloudManagedCardDoc",
+      "description": "Individual player card stored under a cross-web managed account.",
+      "type": "object",
+      "properties": {
+        "accountId": {
+          "type": "string",
+          "description": "Parent cross-web account identifier.",
+          "minLength": 2,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "syncScope": {
+          "type": "string",
+          "description": "Global cross-web partition key.",
+          "enum": ["GLOBAL"],
+          "minLength": 6,
+          "maxLength": 6
+        },
+        "templateId": {
+          "type": "string",
+          "description": "Static player card template identifier.",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "grade": {
+          "type": "integer",
+          "description": "Enhancement grade from 1 to 13."
+        },
+        "ovr": {
+          "type": "integer",
+          "description": "Effective overall rating of the card."
+        },
+        "valueBp": {
+          "type": "number",
+          "description": "Current BP valuation of the card."
+        },
+        "customMinifaceUrl": {
+          "type": "string",
+          "description": "Optional custom miniface path or mobile portrait Data URL.",
+          "minLength": 14,
+          "maxLength": 160000,
+          "pattern": "^(/minifaces/[a-zA-Z0-9_\\-]+\\.png|data:image/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+)$"
+        },
+        "serialNumber": {
+          "type": "integer",
+          "description": "Optional sequential serial number (#0001+)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": [
+        "accountId",
+        "syncScope",
+        "templateId",
+        "grade",
+        "ovr",
+        "valueBp",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "LeaderboardEntry": {
+      "title": "LeaderboardEntry",
+      "description": "Public non-PII cross-device and cross-web leaderboard summary for Ranked Elo, Squad OVR, Squad Value, SVIP, and Best Card OVR.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "description": "Unique account identifier of the manager.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "boardScope": {
+          "type": "string",
+          "description": "Public leaderboard partition key.",
+          "enum": ["GLOBAL"],
+          "minLength": 6,
+          "maxLength": 6
+        },
+        "managerName": {
+          "type": "string",
+          "description": "Public manager display name.",
+          "minLength": 2,
+          "maxLength": 32
+        },
+        "vipLevel": {
+          "type": "integer",
+          "description": "Manager VIP tier from 0 to 20."
+        },
+        "vipPoints": {
+          "type": "integer",
+          "description": "Manager cumulative VIP points."
+        },
+        "squadValue": {
+          "type": "number",
+          "description": "Manager total squad value in BP."
+        },
+        "bestCardOvr": {
+          "type": "integer",
+          "description": "Highest OVR player card owned."
+        },
+        "bestCardName": {
+          "type": "string",
+          "description": "Name of highest OVR player card.",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "bestCardSeason": {
+          "type": "string",
+          "description": "Season badge code of highest OVR card.",
+          "minLength": 1,
+          "maxLength": 16
+        },
+        "bestCardGrade": {
+          "type": "integer",
+          "description": "Enhancement grade (+1 to +13) of highest OVR card."
+        },
+        "elo": {
+          "type": "integer",
+          "description": "Competitive Ranked 1vs1 / GLXH rating points (1000 to 10000)."
+        },
+        "wins": {
+          "type": "integer",
+          "description": "Competitive match wins."
+        },
+        "draws": {
+          "type": "integer",
+          "description": "Competitive match draws."
+        },
+        "losses": {
+          "type": "integer",
+          "description": "Competitive match losses."
+        },
+        "managerLevel": {
+          "type": "integer",
+          "description": "Manager level from 1 to 100."
+        },
+        "squadOvr": {
+          "type": "integer",
+          "description": "Starting XI boosted overall rating (0 to 300)."
+        },
+        "deviceLabel": {
+          "type": "string",
+          "description": "Non-PII platform/device label (e.g. PC Windows, Android, iOS).",
+          "minLength": 2,
+          "maxLength": 40
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": [
+        "ownerId",
+        "boardScope",
+        "managerName",
+        "vipLevel",
+        "vipPoints",
+        "squadValue",
+        "bestCardOvr",
+        "bestCardName",
+        "bestCardSeason",
+        "bestCardGrade",
+        "updatedAt"
+      ]
+    },
+    "ServerRulesDoc": {
+      "title": "ServerRulesDoc",
+      "description": "Global server gameplay rules controlled exclusively by the Administrator game account for all players across devices and webs.",
+      "type": "object",
+      "properties": {
+        "configId": {
+          "type": "string",
+          "description": "Singleton config document key ('global_rules').",
+          "enum": ["global_rules"],
+          "minLength": 12,
+          "maxLength": 12
+        },
+        "guaranteedUpgrade100": {
+          "type": "boolean",
+          "description": "Whether card enhancement succeeds at 100% across the server."
+        },
+        "upgradeRateMultiplier": {
+          "type": "number",
+          "description": "Server enhancement rate multiplier (1, 1.5, 2, or 3)."
+        },
+        "zeroMarketTax": {
+          "type": "boolean",
+          "description": "Whether transfer market sales have 0% tax across the server."
+        },
+        "matchRewardMultiplier": {
+          "type": "integer",
+          "description": "Server match BP & Tarpoi reward multiplier (1, 2, or 3)."
+        },
+        "serverAnnouncement": {
+          "type": "string",
+          "description": "Live announcement banner displayed to all players in the Lobby.",
+          "minLength": 0,
+          "maxLength": 140
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "Display name of the Administrator who updated the rules.",
+          "minLength": 2,
+          "maxLength": 32
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": [
+        "configId",
+        "guaranteedUpgrade100",
+        "upgradeRateMultiplier",
+        "zeroMarketTax",
+        "matchRewardMultiplier",
+        "serverAnnouncement",
+        "updatedBy",
+        "updatedAt"
+      ]
+    },
+    "ServerBroadcastDoc": {
+      "title": "ServerBroadcastDoc",
+      "description": "Immutable server-wide reward broadcast issued by the Administrator game account for all players across devices and webs.",
+      "type": "object",
+      "properties": {
+        "broadcastId": {
+          "type": "string",
+          "description": "Unique broadcast gift identifier.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "scope": {
+          "type": "string",
+          "description": "Public broadcast partition key.",
+          "enum": ["GLOBAL"],
+          "minLength": 6,
+          "maxLength": 6
+        },
+        "actorName": {
+          "type": "string",
+          "description": "Administrator display name.",
+          "minLength": 2,
+          "maxLength": 32
+        },
+        "fcDelta": {
+          "type": "integer",
+          "description": "FC gifted to every player."
+        },
+        "bpDelta": {
+          "type": "number",
+          "description": "BP gifted to every player."
+        },
+        "tarpoiDelta": {
+          "type": "integer",
+          "description": "Star Points (Tarpoi) gifted to every player."
+        },
+        "svipBonusPoints": {
+          "type": "integer",
+          "description": "Bonus VIP points gifted to every player."
+        },
+        "packId": {
+          "type": "string",
+          "description": "Season pack ID gifted to every player.",
+          "minLength": 2,
+          "maxLength": 24
+        },
+        "packCount": {
+          "type": "integer",
+          "description": "Quantity of packs gifted to every player."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        }
+      },
+      "required": [
+        "broadcastId",
+        "scope",
+        "actorName",
+        "fcDelta",
+        "bpDelta",
+        "tarpoiDelta",
+        "svipBonusPoints",
+        "packId",
+        "packCount",
+        "createdAt"
+      ]
+    },
+    "AdminRoleDoc": {
+      "title": "AdminRoleDoc",
+      "description": "Trusted administrator allowlist document keyed by Firebase Auth UID and managed strictly by the root bootstrapped Administrator.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the delegated administrator.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "grantedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when admin privilege was provisioned."
+        }
+      },
+      "required": ["uid", "grantedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "UserSave" },
+      "description": "Private per-manager game progression state (accessible to owner or verified GM Admin)."
+    },
+    "/users/{userId}/cards/{cardId}": {
+      "schema": { "$ref": "PlayerCardDoc" },
+      "description": "Manager-owned player card subcollection (accessible to owner or verified GM Admin)."
+    },
+    "/cloud_managed_accounts/{accountId}": {
+      "schema": { "$ref": "CloudManagedAccountDoc" },
+      "description": "Cross-web and cross-device non-PII game account state writable strictly by verified GM Admins and readable by target game clients."
+    },
+    "/cloud_managed_accounts/{accountId}/cards/{cardId}": {
+      "schema": { "$ref": "CloudManagedCardDoc" },
+      "description": "Player card subcollection for cross-web managed game accounts."
+    },
+    "/leaderboard_entries/{userId}": {
+      "schema": { "$ref": "LeaderboardEntry" },
+      "description": "Public non-PII multi-category leaderboard entries queried by boardScope == GLOBAL."
+    },
+    "/server_config/{configId}": {
+      "schema": { "$ref": "ServerRulesDoc" },
+      "description": "Global server gameplay rules readable by all players and writable strictly by verified Admins."
+    },
+    "/server_broadcasts/{broadcastId}": {
+      "schema": { "$ref": "ServerBroadcastDoc" },
+      "description": "Immutable server-wide reward broadcasts readable by all players (scope == GLOBAL) and created strictly by verified Admins."
+    },
+    "/admins/{adminId}": {
+      "schema": { "$ref": "AdminRoleDoc" },
+      "description": "Trusted delegated administrator registry managed exclusively by the root bootstrapped GM Admin."
+    }
+  }
+}

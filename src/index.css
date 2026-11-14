@@ -1,0 +1,831 @@
+@import "tailwindcss";
+
+@theme {
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: #050810;
+    color: #f1f5f9;
+    overscroll-behavior: none;
+  }
+
+  button,
+  a,
+  [role="button"] {
+    touch-action: manipulation;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fcoTabEnterForward {
+  0% {
+    opacity: 0;
+    transform: translate3d(28px, 0, 0) scale(0.992);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes fcoTabEnterBackward {
+  0% {
+    opacity: 0;
+    transform: translate3d(-28px, 0, 0) scale(0.992);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes fcoTabFadeIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fcoChromeFade {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.fco-tab-enter-forward {
+  animation: fcoTabEnterForward 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform, opacity;
+}
+
+.fco-tab-enter-backward {
+  animation: fcoTabEnterBackward 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform, opacity;
+}
+
+.fco-tab-enter-initial {
+  animation: fcoTabFadeIn 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform, opacity;
+}
+
+.fco-chrome-fade {
+  animation: fcoChromeFade 0.18s ease-out both;
+}
+
+@keyframes iprmPosePrimary {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  38% {
+    opacity: 1;
+    transform: translate3d(0, -1px, 0) scale(1.045);
+  }
+  48%,
+  88% {
+    opacity: 0;
+    transform: translate3d(5px, 0, 0) scale(0.97);
+  }
+  98%,
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes iprmPoseAlt {
+  0%,
+  38% {
+    opacity: 0;
+    transform: translate3d(-5px, 0, 0) scale(0.97);
+  }
+  48% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  88% {
+    opacity: 1;
+    transform: translate3d(0, -1px, 0) scale(1.045);
+  }
+  98%,
+  100% {
+    opacity: 0;
+    transform: translate3d(5px, 0, 0) scale(0.97);
+  }
+}
+
+@keyframes iprmHoloSweep {
+  0%,
+  35% {
+    opacity: 0;
+    transform: translate3d(-125%, 0, 0) skewX(-18deg);
+  }
+  44% {
+    opacity: 0.72;
+  }
+  52%,
+  85% {
+    opacity: 0;
+    transform: translate3d(125%, 0, 0) skewX(-18deg);
+  }
+  94% {
+    opacity: 0.72;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-125%, 0, 0) skewX(-18deg);
+  }
+}
+
+.iprm-pose-primary {
+  animation: iprmPosePrimary 4.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  will-change: transform, opacity;
+}
+
+.iprm-pose-alt {
+  animation: iprmPoseAlt 4.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  will-change: transform, opacity;
+}
+
+.iprm-holo-sweep {
+  animation: iprmHoloSweep 4.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes fcoCardUpgradeShake {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1.08);
+  }
+  15% {
+    transform: translate3d(-20px, -2px, 0) rotate(-6.5deg) scale(1.1);
+  }
+  30% {
+    transform: translate3d(20px, 2px, 0) rotate(6.5deg) scale(1.11);
+  }
+  45% {
+    transform: translate3d(-24px, -3px, 0) rotate(-8deg) scale(1.12);
+  }
+  60% {
+    transform: translate3d(24px, 3px, 0) rotate(8deg) scale(1.12);
+  }
+  75% {
+    transform: translate3d(-16px, -1px, 0) rotate(-5deg) scale(1.11);
+  }
+  90% {
+    transform: translate3d(16px, 1px, 0) rotate(5deg) scale(1.1);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1.08);
+  }
+}
+
+.fco-upgrade-shake {
+  animation: fcoCardUpgradeShake 0.24s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes fcoWalkoutSlam {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 26px, 0) scale(0.84);
+  }
+  65% {
+    opacity: 1;
+    transform: translate3d(0, -4px, 0) scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.fco-walkout-slam {
+  animation: fcoWalkoutSlam 0.48s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes fcoLaserPulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scaleX(0.96);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleX(1.03);
+  }
+}
+
+.fco-laser-pulse {
+  animation: fcoLaserPulse 0.42s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Authentic EA SPORTS FC™ Online PC Client Textures & Accents */
+.fco-pc-scanlines {
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.018) 0px,
+    rgba(255, 255, 255, 0.018) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+}
+
+.fco-pc-carbon {
+  background-color: #090e18;
+  background-image:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.025) 25%, transparent 25%),
+    linear-gradient(225deg, rgba(255, 255, 255, 0.02) 25%, transparent 25%);
+  background-size: 16px 16px;
+}
+
+.fco-pc-chamfer {
+  clip-path: polygon(
+    8px 0%,
+    calc(100% - 8px) 0%,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    0% calc(100% - 8px),
+    0% 8px
+  );
+}
+
+.fco-pc-nav-btn {
+  position: relative;
+  transition: all 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.fco-pc-nav-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background-color: #a3e635;
+  transition: width 0.16s ease;
+}
+.fco-pc-nav-btn:hover::after {
+  width: 72%;
+}
+
+/* Authentic FC Online PC Dark Brushed Metal & Tactical Panel */
+.fco-pc-panel {
+  background: linear-gradient(180deg, rgba(14, 21, 34, 0.96) 0%, rgba(8, 12, 20, 0.98) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+.fco-pc-panel-glow {
+  background: linear-gradient(180deg, rgba(16, 26, 44, 0.97) 0%, rgba(8, 13, 23, 0.99) 100%);
+  border: 1px solid rgba(163, 230, 53, 0.42);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.86), 0 0 20px rgba(163, 230, 53, 0.12), inset 0 1px 0 rgba(163, 230, 53, 0.22);
+}
+
+/* Authentic Pitch Grass Mowed Alternating Turf */
+.fco-pitch-stripes {
+  background:
+    radial-gradient(ellipse at 50% 45%, rgba(22, 101, 52, 0.28) 0%, rgba(4, 22, 14, 0.6) 80%),
+    repeating-linear-gradient(
+      0deg,
+      #0b3622 0px,
+      #0b3622 44px,
+      #082a1a 44px,
+      #082a1a 88px
+    );
+}
+
+/* Metallic Gold Typography Header */
+.fco-text-gold {
+  background: linear-gradient(180deg, #fffbeb 0%, #fef08a 45%, #ca8a04 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Metallic Silver Typography */
+.fco-text-silver {
+  background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 45%, #64748b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Neon Volt Lime Glow Button (Primary EA FC Online Play & Action CTA) */
+.fco-pc-btn-primary {
+  background: linear-gradient(180deg, #bef264 0%, #a3e635 55%, #65a30d 100%);
+  color: #050914;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 18px rgba(163, 230, 53, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  transition: all 0.14s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.fco-pc-btn-primary:hover {
+  background: linear-gradient(180deg, #d9f99d 0%, #bef264 55%, #84cc16 100%);
+  box-shadow: 0 6px 24px rgba(163, 230, 53, 0.56), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+.fco-pc-btn-primary:active {
+  transform: translateY(1px);
+}
+
+/* Metallic Amber Button */
+.fco-pc-btn-gold {
+  background: linear-gradient(180deg, #fef08a 0%, #eab308 55%, #a16207 100%);
+  color: #171103;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 18px rgba(234, 179, 8, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  transition: all 0.14s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.fco-pc-btn-gold:hover {
+  background: linear-gradient(180deg, #fef9c3 0%, #facc15 55%, #ca8a04 100%);
+  box-shadow: 0 6px 24px rgba(234, 179, 8, 0.58), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* Dark Slate Brushed Client Button */
+.fco-pc-btn-slate {
+  background: linear-gradient(180deg, rgba(28, 39, 58, 0.92) 0%, rgba(14, 21, 35, 0.98) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #e2e8f0;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: all 0.14s ease;
+}
+.fco-pc-btn-slate:hover {
+  background: linear-gradient(180deg, rgba(44, 59, 84, 0.95) 0%, rgba(24, 34, 54, 0.98) 100%);
+  border-color: rgba(163, 230, 53, 0.52);
+  color: #ffffff;
+}
+
+/* Pack Showcase Radial Glow */
+.fco-pack-stage-glow {
+  background: radial-gradient(circle at 50% 40%, rgba(56, 189, 248, 0.16) 0%, rgba(163, 230, 53, 0.08) 35%, transparent 70%);
+}
+
+/* 100% Authentic EA SPORTS FC Online PC Client Shell & Angled Geometry */
+.fco-pc-topbar {
+  background: linear-gradient(180deg, rgba(13, 19, 32, 0.98) 0%, rgba(6, 10, 18, 0.98) 100%);
+  border-bottom: 1px solid rgba(163, 230, 53, 0.34);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.82), inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.fco-pc-dock {
+  background: linear-gradient(180deg, rgba(8, 13, 23, 0.98) 0%, rgba(4, 7, 13, 0.99) 100%);
+  border-top: 1px solid rgba(163, 230, 53, 0.36);
+  box-shadow: 0 -10px 28px rgba(0, 0, 0, 0.88), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+.fco-pc-tab-skew {
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+}
+
+.fco-pc-currency-pill {
+  background: linear-gradient(180deg, rgba(15, 23, 39, 0.98) 0%, rgba(8, 13, 22, 0.99) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 2px 6px rgba(0, 0, 0, 0.45);
+}
+
+.fco-pc-mode-tile {
+  background: linear-gradient(135deg, rgba(16, 25, 42, 0.94) 0%, rgba(8, 13, 22, 0.97) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.fco-pc-mode-tile:hover {
+  border-color: rgba(163, 230, 53, 0.58);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.8), 0 0 18px rgba(163, 230, 53, 0.16);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Smooth Mobile Momentum Scrolling */
+.fco-touch-scroll {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* True Mobile Portrait -> Landscape 90° Stage Engine (keeps fixed portals & modals aligned!) */
+@media screen and (orientation: portrait) {
+  html.fco-landscape-90 {
+    position: fixed;
+    top: 0;
+    left: 100vw;
+    width: 100vh;
+    width: 100dvh;
+    height: 100vw;
+    height: 100dvw;
+    transform: rotate(90deg);
+    transform-origin: top left;
+    overflow: hidden;
+    background-color: #050810;
+  }
+
+  html.fco-landscape-90 body {
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    overflow: hidden;
+  }
+}
+
+/* Compact Short-Landscape Phone Height Detection (native 844x390 / 667x375 or rotated) */
+@media screen and (max-height: 460px) {
+  .fco-short-hide {
+    display: none !important;
+  }
+  .fco-short-panel {
+    padding: 0.65rem 1rem !important;
+  }
+  .fco-short-compact-card {
+    transform: scale(0.66);
+    margin: -54px -20px !important;
+  }
+  .fco-short-chamber-card {
+    transform: scale(0.64) !important;
+    margin: -52px -18px !important;
+  }
+  .fco-short-fodder-tray {
+    min-height: 60px !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+  }
+}
+
+/* =========================================================
+   FC ONLINE PC ENHANCEMENT CHAMBER (ĐẬP THẺ) CINEMATICS
+   ========================================================= */
+@keyframes fcoFodderConverge {
+  0% {
+    opacity: 0.95;
+    transform: translate3d(0, 18px, 0) scale(0.92);
+  }
+  55% {
+    opacity: 1;
+    transform: translate3d(0, -14px, 0) scale(0.76);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -64px, 0) scale(0.28);
+  }
+}
+
+.fco-fodder-converge {
+  animation: fcoFodderConverge 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes fcoPistonTopClamp {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -48px, 0);
+  }
+  42% {
+    opacity: 1;
+    transform: translate3d(0, 4px, 0);
+  }
+  65% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 6px, 0);
+  }
+}
+
+@keyframes fcoPistonBottomClamp {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 48px, 0);
+  }
+  42% {
+    opacity: 1;
+    transform: translate3d(0, -4px, 0);
+  }
+  65% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, -6px, 0);
+  }
+}
+
+.fco-piston-top {
+  animation: fcoPistonTopClamp 0.95s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.fco-piston-bottom {
+  animation: fcoPistonBottomClamp 0.95s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes fcoChamberOrbit {
+  0% {
+    transform: rotate(0deg) scale(0.96);
+    opacity: 0.6;
+  }
+  50% {
+    transform: rotate(180deg) scale(1.06);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(360deg) scale(0.96);
+    opacity: 0.6;
+  }
+}
+
+.fco-chamber-orbit {
+  animation: fcoChamberOrbit 1.4s linear infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes fcoShockwaveExpand {
+  0% {
+    opacity: 0.92;
+    transform: scale(0.45);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.15);
+  }
+}
+
+.fco-shockwave-ring {
+  animation: fcoShockwaveExpand 0.72s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes fcoImpactFlash {
+  0% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.fco-impact-flash {
+  animation: fcoImpactFlash 0.48s ease-out forwards;
+  will-change: opacity;
+}
+
+@keyframes fcoGradeSlam {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -14px, 0) scale(1.65);
+  }
+  65% {
+    opacity: 1;
+    transform: translate3d(0, 2px, 0) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.fco-grade-slam {
+  animation: fcoGradeSlam 0.48s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* =========================================================
+   FC ONLINE PC PACK TEAR & WALKOUT TUNNEL (MỞ THẺ)
+   ========================================================= */
+@keyframes fcoPackHover {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-0.8deg);
+  }
+  50% {
+    transform: translate3d(0, -8px, 0) rotate(0.8deg);
+  }
+}
+
+.fco-pack-hover {
+  animation: fcoPackHover 2.2s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes fcoSlashLaser {
+  0% {
+    opacity: 0;
+    transform: translate3d(-115%, 0, 0) scaleX(0.3);
+  }
+  30% {
+    opacity: 1;
+    transform: translate3d(0%, 0, 0) scaleX(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(115%, 0, 0) scaleX(0.5);
+  }
+}
+
+.fco-slash-laser {
+  animation: fcoSlashLaser 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes fcoFoilTearAway {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(42px, -78px, 0) rotate(16deg) scale(0.88);
+  }
+}
+
+.fco-foil-tear-away {
+  animation: fcoFoilTearAway 0.62s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes fcoPackErupt {
+  0% {
+    opacity: 0;
+    transform: scale(0.35);
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1.22);
+  }
+  100% {
+    opacity: 0.15;
+    transform: scale(1.75);
+  }
+}
+
+.fco-pack-erupt {
+  animation: fcoPackErupt 0.72s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes fcoTunnelDoorLeft {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-94%, 0, 0);
+  }
+}
+
+@keyframes fcoTunnelDoorRight {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(94%, 0, 0);
+  }
+}
+
+.fco-tunnel-door-left {
+  animation: fcoTunnelDoorLeft 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform;
+}
+
+.fco-tunnel-door-right {
+  animation: fcoTunnelDoorRight 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform;
+}
+
+@keyframes fcoBeamSweepLeft {
+  0%,
+  100% {
+    transform: rotate(-18deg) scaleY(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: rotate(-8deg) scaleY(1.06);
+    opacity: 0.65;
+  }
+}
+
+@keyframes fcoBeamSweepRight {
+  0%,
+  100% {
+    transform: rotate(18deg) scaleY(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: rotate(8deg) scaleY(1.06);
+    opacity: 0.65;
+  }
+}
+
+.fco-beam-left {
+  animation: fcoBeamSweepLeft 3.4s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.fco-beam-right {
+  animation: fcoBeamSweepRight 3.4s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes fcoCardFlip3D {
+  0% {
+    opacity: 0.25;
+    transform: perspective(700px) rotateY(90deg) scale(0.88);
+  }
+  65% {
+    opacity: 1;
+    transform: perspective(700px) rotateY(-8deg) scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(700px) rotateY(0deg) scale(1);
+  }
+}
+
+.fco-card-flip-3d {
+  animation: fcoCardFlip3D 0.46s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iprm-pose-primary,
+  .iprm-pose-alt,
+  .iprm-holo-sweep,
+  .fco-upgrade-shake,
+  .fco-walkout-slam,
+  .fco-laser-pulse,
+  .fco-fodder-converge,
+  .fco-piston-top,
+  .fco-piston-bottom,
+  .fco-chamber-orbit,
+  .fco-shockwave-ring,
+  .fco-impact-flash,
+  .fco-grade-slam,
+  .fco-pack-hover,
+  .fco-slash-laser,
+  .fco-foil-tear-away,
+  .fco-pack-erupt,
+  .fco-tunnel-door-left,
+  .fco-tunnel-door-right,
+  .fco-beam-left,
+  .fco-beam-right,
+  .fco-card-flip-3d,
+  .fco-tab-enter-forward,
+  .fco-tab-enter-backward,
+  .fco-tab-enter-initial,
+  .fco-chrome-fade,
+  .animate-fadeIn {
+    animation: none;
+  }
+  .iprm-pose-alt,
+  .iprm-holo-sweep {
+    opacity: 0;
+  }
+}

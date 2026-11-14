@@ -1,0 +1,743 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isBootstrappedAdminEmail() {
+      return isVerifiedUser() && request.auth.token.email == 'daipss9789@gmail.com';
+    }
+
+    function isAdmin() {
+      return isVerifiedUser() && (
+        request.auth.token.email == 'daipss9789@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isSafeNumber(val, minVal, maxVal) {
+      return (val is int || val is float) && val >= minVal && val <= maxVal;
+    }
+
+    function isParentUserDocValid(userId) {
+      return (
+        exists(/databases/$(database)/documents/users/$(userId)) &&
+        get(/databases/$(database)/documents/users/$(userId)).data.ownerId == userId
+      ) || (
+        existsAfter(/databases/$(database)/documents/users/$(userId)) &&
+        getAfter(/databases/$(database)/documents/users/$(userId)).data.ownerId == userId
+      );
+    }
+
+    function isParentCloudManagedDocValid(accountId) {
+      return (
+        exists(/databases/$(database)/documents/cloud_managed_accounts/$(accountId)) &&
+        get(/databases/$(database)/documents/cloud_managed_accounts/$(accountId)).data.accountId == accountId
+      ) || (
+        existsAfter(/databases/$(database)/documents/cloud_managed_accounts/$(accountId)) &&
+        getAfter(/databases/$(database)/documents/cloud_managed_accounts/$(accountId)).data.accountId == accountId
+      );
+    }
+
+    function isValidPackId(packId) {
+      return packId is string &&
+        packId.size() >= 2 &&
+        packId.size() <= 24 &&
+        packId in [
+          'iprm_pack', 'le_pack', 'ucl_26', 'vb_26', 'icon_tm',
+          'toty_26', 'tots_26', 'bdo_pack', 'up_pack', 'ucl_25', 'cu_fodder'
+        ];
+    }
+
+    function isValidPackMap(packs) {
+      return packs is map &&
+        packs.keys().hasAll([
+          'iprm_pack', 'le_pack', 'ucl_26', 'vb_26', 'icon_tm',
+          'toty_26', 'tots_26', 'bdo_pack', 'up_pack', 'ucl_25', 'cu_fodder'
+        ]) &&
+        packs.keys().hasOnly([
+          'iprm_pack', 'le_pack', 'ucl_26', 'vb_26', 'icon_tm',
+          'toty_26', 'tots_26', 'bdo_pack', 'up_pack', 'ucl_25', 'cu_fodder'
+        ]) &&
+        packs.iprm_pack is int && packs.iprm_pack >= 0 && packs.iprm_pack <= 100000 &&
+        packs.le_pack is int && packs.le_pack >= 0 && packs.le_pack <= 100000 &&
+        packs.ucl_26 is int && packs.ucl_26 >= 0 && packs.ucl_26 <= 100000 &&
+        packs.vb_26 is int && packs.vb_26 >= 0 && packs.vb_26 <= 100000 &&
+        packs.icon_tm is int && packs.icon_tm >= 0 && packs.icon_tm <= 100000 &&
+        packs.toty_26 is int && packs.toty_26 >= 0 && packs.toty_26 <= 100000 &&
+        packs.tots_26 is int && packs.tots_26 >= 0 && packs.tots_26 <= 100000 &&
+        packs.bdo_pack is int && packs.bdo_pack >= 0 && packs.bdo_pack <= 100000 &&
+        packs.up_pack is int && packs.up_pack >= 0 && packs.up_pack <= 100000 &&
+        packs.ucl_25 is int && packs.ucl_25 >= 0 && packs.ucl_25 <= 100000 &&
+        packs.cu_fodder is int && packs.cu_fodder >= 0 && packs.cu_fodder <= 100000;
+    }
+
+    function isValidIntList(arr, maxLen) {
+      return arr is list &&
+        arr.size() <= maxLen &&
+        (arr.size() == 0 || arr[0] is int);
+    }
+
+    function isValidStringIdList(arr, maxLen) {
+      return arr is list &&
+        arr.size() <= maxLen &&
+        (
+          arr.size() == 0 ||
+          (arr[0] is string && arr[0].size() >= 1 && arr[0].size() <= 128 && arr[0].matches('^[a-zA-Z0-9_\\-]+$'))
+        );
+    }
+
+    function isValidAdminRoleDoc(data, targetAdminId) {
+      return data.keys().hasAll(['uid', 'grantedAt']) &&
+        data.keys().hasOnly(['uid', 'grantedAt']) &&
+        data.uid is string && data.uid.size() >= 1 && data.uid.size() <= 128 &&
+        data.uid.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.uid == targetAdminId &&
+        data.grantedAt is timestamp;
+    }
+
+    function isValidUserSave(data, targetUserId) {
+      return data.keys().hasAll([
+          'ownerId', 'managerName', 'fc', 'bp', 'vipPoints', 'vipLevel',
+          'foosballLoops', 'foosballSpins', 'foosballJackpotFc', 'squadValue', 'bestCardOvr',
+          'bestCardName', 'bestCardSeason', 'bestCardGrade', 'packs',
+          'claimedMilestones', 'claimedVipRewards', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'ownerId', 'managerName', 'deviceLabel', 'fc', 'bp', 'starPoints', 'nextCardSerial', 'vipPoints', 'vipLevel',
+          'foosballLoops', 'foosballSpins', 'foosballJackpotFc', 'squadValue', 'bestCardOvr',
+          'bestCardName', 'bestCardSeason', 'bestCardGrade', 'packs',
+          'claimedMilestones', 'claimedVipRewards',
+          'formation', 'activeTeamColorId', 'lineupSlotUids',
+          'elo', 'wins', 'draws', 'losses', 'managerXp', 'squadOvr', 'claimedBroadcastIds',
+          'isBanned', 'banReason', 'isDelegatedAdmin', 'adminRevision',
+          'createdAt', 'updatedAt'
+        ]) &&
+        data.ownerId is string && data.ownerId.size() >= 1 && data.ownerId.size() <= 128 &&
+        data.ownerId.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.ownerId == targetUserId &&
+        data.managerName is string && data.managerName.size() >= 2 && data.managerName.size() <= 32 &&
+        (
+          !('deviceLabel' in data) ||
+          (data.deviceLabel is string && data.deviceLabel.size() >= 2 && data.deviceLabel.size() <= 40)
+        ) &&
+        data.fc is int && data.fc >= 0 && data.fc <= 1000000000 &&
+        isSafeNumber(data.bp, 0, 8500000000000000) &&
+        data.vipPoints is int && data.vipPoints >= 0 && data.vipPoints <= 100000000 &&
+        data.vipLevel is int && data.vipLevel >= 0 && data.vipLevel <= 20 &&
+        data.foosballLoops is int && data.foosballLoops >= 0 && data.foosballLoops <= 1000000 &&
+        data.foosballSpins is int && data.foosballSpins >= 0 && data.foosballSpins <= 10000000 &&
+        data.foosballJackpotFc is int && data.foosballJackpotFc >= 100 && data.foosballJackpotFc <= 1000000 &&
+        isSafeNumber(data.squadValue, 0, 8500000000000000) &&
+        data.bestCardOvr is int && data.bestCardOvr >= 0 && data.bestCardOvr <= 300 &&
+        data.bestCardName is string && data.bestCardName.size() >= 1 && data.bestCardName.size() <= 60 &&
+        data.bestCardSeason is string && data.bestCardSeason.size() >= 1 && data.bestCardSeason.size() <= 16 &&
+        data.bestCardGrade is int && data.bestCardGrade >= 1 && data.bestCardGrade <= 13 &&
+        isValidPackMap(data.packs) &&
+        isValidIntList(data.claimedMilestones, 24) &&
+        isValidIntList(data.claimedVipRewards, 24) &&
+        (
+          !('formation' in data) ||
+          (
+            data.formation is string &&
+            data.formation.size() >= 5 &&
+            data.formation.size() <= 16 &&
+            data.formation.matches('^[a-zA-Z0-9\\-]+$')
+          )
+        ) &&
+        (
+          !('activeTeamColorId' in data) ||
+          (
+            data.activeTeamColorId is string &&
+            data.activeTeamColorId.size() >= 2 &&
+            data.activeTeamColorId.size() <= 48 &&
+            data.activeTeamColorId.matches('^[a-zA-Z0-9_\\-]+$')
+          )
+        ) &&
+        (
+          !('starPoints' in data) ||
+          (data.starPoints is int && data.starPoints >= 0 && data.starPoints <= 1000000000)
+        ) &&
+        (
+          !('nextCardSerial' in data) ||
+          (data.nextCardSerial is int && data.nextCardSerial >= 1 && data.nextCardSerial <= 100000000)
+        ) &&
+        (
+          !('lineupSlotUids' in data) ||
+          isValidStringIdList(data.lineupSlotUids, 11)
+        ) &&
+        (
+          !('elo' in data) ||
+          (data.elo is int && data.elo >= 1000 && data.elo <= 10000)
+        ) &&
+        (
+          !('wins' in data) ||
+          (data.wins is int && data.wins >= 0 && data.wins <= 1000000)
+        ) &&
+        (
+          !('draws' in data) ||
+          (data.draws is int && data.draws >= 0 && data.draws <= 1000000)
+        ) &&
+        (
+          !('losses' in data) ||
+          (data.losses is int && data.losses >= 0 && data.losses <= 1000000)
+        ) &&
+        (
+          !('managerXp' in data) ||
+          (data.managerXp is int && data.managerXp >= 0 && data.managerXp <= 100000000)
+        ) &&
+        (
+          !('squadOvr' in data) ||
+          (data.squadOvr is int && data.squadOvr >= 0 && data.squadOvr <= 300)
+        ) &&
+        (
+          !('claimedBroadcastIds' in data) ||
+          isValidStringIdList(data.claimedBroadcastIds, 50)
+        ) &&
+        (
+          !('isBanned' in data) ||
+          (data.isBanned is bool)
+        ) &&
+        (
+          !('banReason' in data) ||
+          (data.banReason is string && data.banReason.size() >= 0 && data.banReason.size() <= 100)
+        ) &&
+        (
+          !('isDelegatedAdmin' in data) ||
+          (data.isDelegatedAdmin is bool)
+        ) &&
+        (
+          !('adminRevision' in data) ||
+          (data.adminRevision is int && data.adminRevision >= 0 && data.adminRevision <= 100000000)
+        ) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isOwnerRbacPreservedOnUserUpdate() {
+      return (!('isBanned' in existing()) || existing().isBanned == false) &&
+        (!('isBanned' in incoming()) || incoming().isBanned == false) &&
+        (
+          (!('isDelegatedAdmin' in existing()) || existing().isDelegatedAdmin == false)
+            ? (!('isDelegatedAdmin' in incoming()) || incoming().isDelegatedAdmin == false)
+            : ('isDelegatedAdmin' in incoming() && incoming().isDelegatedAdmin == true)
+        ) &&
+        (
+          !('adminRevision' in existing())
+            ? (!('adminRevision' in incoming()) || incoming().adminRevision == 0)
+            : ('adminRevision' in incoming() && incoming().adminRevision == existing().adminRevision)
+        );
+    }
+
+    function isLegacyUserDocSchema() {
+      return !existing().keys().hasOnly([
+        'ownerId', 'managerName', 'deviceLabel', 'fc', 'bp', 'starPoints', 'nextCardSerial', 'vipPoints', 'vipLevel',
+        'foosballLoops', 'foosballSpins', 'foosballJackpotFc', 'squadValue', 'bestCardOvr',
+        'bestCardName', 'bestCardSeason', 'bestCardGrade', 'packs',
+        'claimedMilestones', 'claimedVipRewards',
+        'formation', 'activeTeamColorId', 'lineupSlotUids',
+        'elo', 'wins', 'draws', 'losses', 'managerXp', 'squadOvr', 'claimedBroadcastIds',
+        'isBanned', 'banReason', 'isDelegatedAdmin', 'adminRevision',
+        'createdAt', 'updatedAt'
+      ]);
+    }
+
+    function isValidPlayerCardDoc(data, targetUserId) {
+      return data.keys().hasAll([
+          'ownerId', 'templateId', 'grade', 'ovr', 'valueBp', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'ownerId', 'templateId', 'grade', 'ovr', 'valueBp', 'customMinifaceUrl', 'serialNumber', 'createdAt', 'updatedAt'
+        ]) &&
+        data.ownerId is string && data.ownerId.size() >= 1 && data.ownerId.size() <= 128 &&
+        data.ownerId.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.ownerId == targetUserId &&
+        data.templateId is string && data.templateId.size() >= 1 && data.templateId.size() <= 64 &&
+        data.templateId.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.grade is int && data.grade >= 1 && data.grade <= 13 &&
+        data.ovr is int && data.ovr >= 1 && data.ovr <= 300 &&
+        isSafeNumber(data.valueBp, 0, 8500000000000000) &&
+        (
+          !('customMinifaceUrl' in data) ||
+          (
+            data.customMinifaceUrl is string &&
+            data.customMinifaceUrl.size() >= 14 &&
+            data.customMinifaceUrl.size() <= 160000 &&
+            data.customMinifaceUrl.matches('^(/minifaces/[a-zA-Z0-9_\\-]+\\.png|data:image/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+)$')
+          )
+        ) &&
+        (
+          !('serialNumber' in data) ||
+          (data.serialNumber is int && data.serialNumber >= 1 && data.serialNumber <= 100000000)
+        ) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidCloudManagedAccountDoc(data, targetAccountId) {
+      return data.keys().hasAll([
+          'accountId', 'syncScope', 'authMode', 'managerName', 'deviceLabel',
+          'fc', 'bp', 'starPoints', 'nextCardSerial', 'vipPoints', 'vipLevel',
+          'foosballLoops', 'foosballSpins', 'foosballJackpotFc', 'squadValue',
+          'bestCardOvr', 'bestCardName', 'bestCardSeason', 'bestCardGrade',
+          'packs', 'claimedMilestones', 'claimedVipRewards',
+          'isBanned', 'banReason', 'isDelegatedAdmin', 'adminRevision', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'accountId', 'syncScope', 'authMode', 'managerName', 'deviceLabel',
+          'fc', 'bp', 'starPoints', 'nextCardSerial', 'vipPoints', 'vipLevel',
+          'foosballLoops', 'foosballSpins', 'foosballJackpotFc', 'squadValue',
+          'bestCardOvr', 'bestCardName', 'bestCardSeason', 'bestCardGrade',
+          'elo', 'wins', 'draws', 'losses', 'managerXp', 'squadOvr',
+          'packs', 'claimedMilestones', 'claimedVipRewards', 'claimedBroadcastIds',
+          'formation', 'activeTeamColorId', 'lineupSlotUids',
+          'isBanned', 'banReason', 'isDelegatedAdmin', 'adminRevision', 'updatedAt'
+        ]) &&
+        data.accountId is string && data.accountId.size() >= 2 && data.accountId.size() <= 128 &&
+        data.accountId.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.accountId == targetAccountId &&
+        data.syncScope is string && data.syncScope.size() == 6 && data.syncScope == 'GLOBAL' &&
+        data.authMode is string && data.authMode.size() >= 5 && data.authMode.size() <= 8 &&
+        data.authMode in ['local', 'guest', 'firebase'] &&
+        data.managerName is string && data.managerName.size() >= 2 && data.managerName.size() <= 32 &&
+        data.deviceLabel is string && data.deviceLabel.size() >= 2 && data.deviceLabel.size() <= 40 &&
+        data.fc is int && data.fc >= 0 && data.fc <= 1000000000 &&
+        isSafeNumber(data.bp, 0, 8500000000000000) &&
+        data.starPoints is int && data.starPoints >= 0 && data.starPoints <= 1000000000 &&
+        data.nextCardSerial is int && data.nextCardSerial >= 1 && data.nextCardSerial <= 100000000 &&
+        data.vipPoints is int && data.vipPoints >= 0 && data.vipPoints <= 100000000 &&
+        data.vipLevel is int && data.vipLevel >= 0 && data.vipLevel <= 20 &&
+        data.foosballLoops is int && data.foosballLoops >= 0 && data.foosballLoops <= 1000000 &&
+        data.foosballSpins is int && data.foosballSpins >= 0 && data.foosballSpins <= 10000000 &&
+        data.foosballJackpotFc is int && data.foosballJackpotFc >= 100 && data.foosballJackpotFc <= 1000000 &&
+        isSafeNumber(data.squadValue, 0, 8500000000000000) &&
+        data.bestCardOvr is int && data.bestCardOvr >= 0 && data.bestCardOvr <= 300 &&
+        data.bestCardName is string && data.bestCardName.size() >= 1 && data.bestCardName.size() <= 60 &&
+        data.bestCardSeason is string && data.bestCardSeason.size() >= 1 && data.bestCardSeason.size() <= 16 &&
+        data.bestCardGrade is int && data.bestCardGrade >= 1 && data.bestCardGrade <= 13 &&
+        isValidPackMap(data.packs) &&
+        isValidIntList(data.claimedMilestones, 24) &&
+        isValidIntList(data.claimedVipRewards, 24) &&
+        (
+          !('formation' in data) ||
+          (
+            data.formation is string &&
+            data.formation.size() >= 5 &&
+            data.formation.size() <= 16 &&
+            data.formation.matches('^[a-zA-Z0-9\\-]+$')
+          )
+        ) &&
+        (
+          !('activeTeamColorId' in data) ||
+          (
+            data.activeTeamColorId is string &&
+            data.activeTeamColorId.size() >= 2 &&
+            data.activeTeamColorId.size() <= 48 &&
+            data.activeTeamColorId.matches('^[a-zA-Z0-9_\\-]+$')
+          )
+        ) &&
+        (
+          !('lineupSlotUids' in data) ||
+          isValidStringIdList(data.lineupSlotUids, 11)
+        ) &&
+        (
+          !('elo' in data) ||
+          (data.elo is int && data.elo >= 1000 && data.elo <= 10000)
+        ) &&
+        (
+          !('wins' in data) ||
+          (data.wins is int && data.wins >= 0 && data.wins <= 1000000)
+        ) &&
+        (
+          !('draws' in data) ||
+          (data.draws is int && data.draws >= 0 && data.draws <= 1000000)
+        ) &&
+        (
+          !('losses' in data) ||
+          (data.losses is int && data.losses >= 0 && data.losses <= 1000000)
+        ) &&
+        (
+          !('managerXp' in data) ||
+          (data.managerXp is int && data.managerXp >= 0 && data.managerXp <= 100000000)
+        ) &&
+        (
+          !('squadOvr' in data) ||
+          (data.squadOvr is int && data.squadOvr >= 0 && data.squadOvr <= 300)
+        ) &&
+        (
+          !('claimedBroadcastIds' in data) ||
+          isValidStringIdList(data.claimedBroadcastIds, 50)
+        ) &&
+        data.isBanned is bool &&
+        data.banReason is string && data.banReason.size() >= 0 && data.banReason.size() <= 100 &&
+        data.isDelegatedAdmin is bool &&
+        data.adminRevision is int && data.adminRevision >= 0 && data.adminRevision <= 100000000 &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidCloudManagedCardDoc(data, targetAccountId) {
+      return data.keys().hasAll([
+          'accountId', 'syncScope', 'templateId', 'grade', 'ovr', 'valueBp', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'accountId', 'syncScope', 'templateId', 'grade', 'ovr', 'valueBp',
+          'customMinifaceUrl', 'serialNumber', 'createdAt', 'updatedAt'
+        ]) &&
+        data.accountId is string && data.accountId.size() >= 2 && data.accountId.size() <= 128 &&
+        data.accountId.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.accountId == targetAccountId &&
+        data.syncScope is string && data.syncScope.size() == 6 && data.syncScope == 'GLOBAL' &&
+        data.templateId is string && data.templateId.size() >= 1 && data.templateId.size() <= 64 &&
+        data.templateId.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.grade is int && data.grade >= 1 && data.grade <= 13 &&
+        data.ovr is int && data.ovr >= 1 && data.ovr <= 300 &&
+        isSafeNumber(data.valueBp, 0, 8500000000000000) &&
+        (
+          !('customMinifaceUrl' in data) ||
+          (
+            data.customMinifaceUrl is string &&
+            data.customMinifaceUrl.size() >= 14 &&
+            data.customMinifaceUrl.size() <= 160000 &&
+            data.customMinifaceUrl.matches('^(/minifaces/[a-zA-Z0-9_\\-]+\\.png|data:image/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+)$')
+          )
+        ) &&
+        (
+          !('serialNumber' in data) ||
+          (data.serialNumber is int && data.serialNumber >= 1 && data.serialNumber <= 100000000)
+        ) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidLeaderboardEntry(data, targetUserId) {
+      return data.keys().hasAll([
+          'ownerId', 'boardScope', 'managerName', 'vipLevel', 'vipPoints',
+          'squadValue', 'bestCardOvr', 'bestCardName', 'bestCardSeason',
+          'bestCardGrade', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'ownerId', 'boardScope', 'managerName', 'vipLevel', 'vipPoints',
+          'squadValue', 'bestCardOvr', 'bestCardName', 'bestCardSeason',
+          'bestCardGrade', 'elo', 'wins', 'draws', 'losses',
+          'managerLevel', 'squadOvr', 'deviceLabel', 'updatedAt'
+        ]) &&
+        data.ownerId is string && data.ownerId.size() >= 1 && data.ownerId.size() <= 128 &&
+        data.ownerId.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.ownerId == targetUserId &&
+        data.boardScope is string && data.boardScope.size() == 6 && data.boardScope == 'GLOBAL' &&
+        data.managerName is string && data.managerName.size() >= 2 && data.managerName.size() <= 32 &&
+        data.vipLevel is int && data.vipLevel >= 0 && data.vipLevel <= 20 &&
+        data.vipPoints is int && data.vipPoints >= 0 && data.vipPoints <= 100000000 &&
+        isSafeNumber(data.squadValue, 0, 8500000000000000) &&
+        data.bestCardOvr is int && data.bestCardOvr >= 0 && data.bestCardOvr <= 300 &&
+        data.bestCardName is string && data.bestCardName.size() >= 1 && data.bestCardName.size() <= 60 &&
+        data.bestCardSeason is string && data.bestCardSeason.size() >= 1 && data.bestCardSeason.size() <= 16 &&
+        data.bestCardGrade is int && data.bestCardGrade >= 1 && data.bestCardGrade <= 13 &&
+        (
+          !('elo' in data) ||
+          (data.elo is int && data.elo >= 1000 && data.elo <= 10000)
+        ) &&
+        (
+          !('wins' in data) ||
+          (data.wins is int && data.wins >= 0 && data.wins <= 1000000)
+        ) &&
+        (
+          !('draws' in data) ||
+          (data.draws is int && data.draws >= 0 && data.draws <= 1000000)
+        ) &&
+        (
+          !('losses' in data) ||
+          (data.losses is int && data.losses >= 0 && data.losses <= 1000000)
+        ) &&
+        (
+          !('managerLevel' in data) ||
+          (data.managerLevel is int && data.managerLevel >= 1 && data.managerLevel <= 100)
+        ) &&
+        (
+          !('squadOvr' in data) ||
+          (data.squadOvr is int && data.squadOvr >= 0 && data.squadOvr <= 300)
+        ) &&
+        (
+          !('deviceLabel' in data) ||
+          (data.deviceLabel is string && data.deviceLabel.size() >= 2 && data.deviceLabel.size() <= 40)
+        ) &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidServerRulesDoc(data, targetConfigId) {
+      return data.keys().hasAll([
+          'configId', 'guaranteedUpgrade100', 'upgradeRateMultiplier',
+          'zeroMarketTax', 'matchRewardMultiplier', 'serverAnnouncement',
+          'updatedBy', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'configId', 'guaranteedUpgrade100', 'upgradeRateMultiplier',
+          'zeroMarketTax', 'matchRewardMultiplier', 'serverAnnouncement',
+          'updatedBy', 'updatedAt'
+        ]) &&
+        data.configId is string && data.configId.size() == 12 &&
+        data.configId == 'global_rules' &&
+        data.configId == targetConfigId &&
+        data.guaranteedUpgrade100 is bool &&
+        (data.upgradeRateMultiplier is int || data.upgradeRateMultiplier is float) &&
+        data.upgradeRateMultiplier >= 1 && data.upgradeRateMultiplier <= 3 &&
+        data.zeroMarketTax is bool &&
+        data.matchRewardMultiplier is int &&
+        data.matchRewardMultiplier >= 1 && data.matchRewardMultiplier <= 3 &&
+        data.serverAnnouncement is string &&
+        data.serverAnnouncement.size() >= 0 && data.serverAnnouncement.size() <= 140 &&
+        data.updatedBy is string &&
+        data.updatedBy.size() >= 2 && data.updatedBy.size() <= 32 &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidServerBroadcastDoc(data, targetBroadcastId) {
+      return data.keys().hasAll([
+          'broadcastId', 'scope', 'actorName', 'fcDelta', 'bpDelta',
+          'tarpoiDelta', 'svipBonusPoints', 'packId', 'packCount', 'createdAt'
+        ]) &&
+        data.keys().hasOnly([
+          'broadcastId', 'scope', 'actorName', 'fcDelta', 'bpDelta',
+          'tarpoiDelta', 'svipBonusPoints', 'packId', 'packCount', 'createdAt'
+        ]) &&
+        data.broadcastId is string &&
+        data.broadcastId.size() >= 1 && data.broadcastId.size() <= 128 &&
+        data.broadcastId.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.broadcastId == targetBroadcastId &&
+        data.scope is string && data.scope.size() == 6 && data.scope == 'GLOBAL' &&
+        data.actorName is string && data.actorName.size() >= 2 && data.actorName.size() <= 32 &&
+        data.fcDelta is int && data.fcDelta >= 0 && data.fcDelta <= 100000000 &&
+        isSafeNumber(data.bpDelta, 0, 5000000000000000) &&
+        data.tarpoiDelta is int && data.tarpoiDelta >= 0 && data.tarpoiDelta <= 100000000 &&
+        data.svipBonusPoints is int && data.svipBonusPoints >= 0 && data.svipBonusPoints <= 1000000 &&
+        isValidPackId(data.packId) &&
+        data.packCount is int && data.packCount >= 0 && data.packCount <= 1000 &&
+        data.createdAt is timestamp;
+    }
+
+    match /admins/{adminId} {
+      allow get: if isSignedIn() && isValidId(adminId) && (adminId == request.auth.uid || isAdmin());
+      allow list: if false;
+      allow create: if isBootstrappedAdminEmail() && isValidId(adminId) &&
+        isValidAdminRoleDoc(incoming(), adminId) &&
+        incoming().grantedAt == request.time &&
+        isParentUserDocValid(adminId);
+      allow update: if false;
+      allow delete: if isBootstrappedAdminEmail() && isValidId(adminId);
+    }
+
+    match /server_config/{configId} {
+      allow get: if isValidId(configId) && configId == 'global_rules';
+      allow list: if false;
+      allow create: if isVerifiedUser() && isValidId(configId) &&
+        configId == 'global_rules' &&
+        isValidServerRulesDoc(incoming(), configId) &&
+        incoming().updatedAt == request.time &&
+        isAdmin();
+      allow update: if isVerifiedUser() && isValidId(configId) &&
+        configId == 'global_rules' &&
+        isValidServerRulesDoc(incoming(), configId) &&
+        incoming().configId == existing().configId &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'guaranteedUpgrade100', 'upgradeRateMultiplier', 'zeroMarketTax',
+          'matchRewardMultiplier', 'serverAnnouncement', 'updatedBy', 'updatedAt'
+        ]) &&
+        isAdmin();
+      allow delete: if false;
+    }
+
+    match /server_broadcasts/{broadcastId} {
+      allow get: if isValidId(broadcastId) && (resource == null || existing().scope == 'GLOBAL');
+      allow list: if resource.data.scope == 'GLOBAL';
+      allow create: if isVerifiedUser() && isValidId(broadcastId) &&
+        isValidServerBroadcastDoc(incoming(), broadcastId) &&
+        incoming().createdAt == request.time &&
+        isAdmin();
+      allow update: if false;
+      allow delete: if isVerifiedUser() && isValidId(broadcastId) && isAdmin();
+    }
+
+    match /users/{userId} {
+      allow get: if isSignedIn() && isValidId(userId) && (
+        (userId == request.auth.uid && (resource == null || !('ownerId' in existing()) || existing().ownerId == request.auth.uid)) ||
+        isAdmin()
+      );
+      allow list: if false;
+      allow create: if isVerifiedUser() && isValidId(userId) &&
+        isValidUserSave(incoming(), userId) &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time && (
+          isAdmin() ||
+          (
+            userId == request.auth.uid &&
+            (!('isBanned' in incoming()) || incoming().isBanned == false) &&
+            (!('isDelegatedAdmin' in incoming()) || incoming().isDelegatedAdmin == false) &&
+            (!('adminRevision' in incoming()) || incoming().adminRevision == 0)
+          )
+        );
+      allow update: if isVerifiedUser() && isValidId(userId) &&
+        isValidUserSave(incoming(), userId) &&
+        (((!('ownerId' in existing()) || !(existing().ownerId is string)) && incoming().ownerId == userId) || (existing().ownerId is string && incoming().ownerId == existing().ownerId)) &&
+        (((!('createdAt' in existing()) || !(existing().createdAt is timestamp)) && incoming().createdAt == request.time) || (existing().createdAt is timestamp && incoming().createdAt == existing().createdAt)) &&
+        incoming().updatedAt == request.time && (
+          isAdmin() ||
+          (
+            userId == request.auth.uid &&
+            isOwnerRbacPreservedOnUserUpdate() &&
+            (
+              incoming().diff(existing()).affectedKeys().hasOnly([
+                'managerName', 'deviceLabel', 'fc', 'bp', 'starPoints', 'nextCardSerial', 'vipPoints', 'vipLevel',
+                'foosballLoops', 'foosballSpins', 'foosballJackpotFc', 'squadValue', 'bestCardOvr',
+                'bestCardName', 'bestCardSeason', 'bestCardGrade', 'packs',
+                'claimedMilestones', 'claimedVipRewards',
+                'formation', 'activeTeamColorId', 'lineupSlotUids',
+                'elo', 'wins', 'draws', 'losses', 'managerXp', 'squadOvr', 'claimedBroadcastIds',
+                'updatedAt'
+              ]) ||
+              isLegacyUserDocSchema() ||
+              !('createdAt' in existing()) ||
+              !(existing().createdAt is timestamp)
+            )
+          )
+        );
+      allow delete: if isVerifiedUser() && isValidId(userId) && isAdmin();
+
+      match /cards/{cardId} {
+        allow get: if isSignedIn() && isValidId(userId) && isValidId(cardId) &&
+          ((userId == request.auth.uid && (resource == null || existing().ownerId == request.auth.uid)) || isAdmin()) &&
+          isParentUserDocValid(userId);
+        allow list: if isSignedIn() && (
+          resource.data.ownerId == request.auth.uid ||
+          (isBootstrappedAdminEmail() && resource.data.ownerId == userId)
+        );
+        allow create: if isVerifiedUser() && isValidId(userId) && isValidId(cardId) &&
+          isValidPlayerCardDoc(incoming(), userId) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          (userId == request.auth.uid || isAdmin()) &&
+          isParentUserDocValid(userId);
+        allow update: if isVerifiedUser() && isValidId(userId) && isValidId(cardId) &&
+          isValidPlayerCardDoc(incoming(), userId) &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().templateId == existing().templateId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time && (
+            isAdmin() ||
+            (
+              userId == request.auth.uid &&
+              incoming().diff(existing()).affectedKeys().hasOnly([
+                'grade', 'ovr', 'valueBp', 'customMinifaceUrl', 'serialNumber', 'updatedAt'
+              ])
+            )
+          ) &&
+          isParentUserDocValid(userId);
+        allow delete: if isVerifiedUser() && isValidId(userId) && isValidId(cardId) &&
+          existing().ownerId == userId &&
+          (userId == request.auth.uid || isAdmin()) &&
+          isParentUserDocValid(userId);
+      }
+    }
+
+    match /cloud_managed_accounts/{accountId} {
+      allow get: if isValidId(accountId) && (resource == null || existing().syncScope == 'GLOBAL');
+      allow list: if isBootstrappedAdminEmail() && resource.data.syncScope == 'GLOBAL';
+      allow create: if isVerifiedUser() && isValidId(accountId) &&
+        isValidCloudManagedAccountDoc(incoming(), accountId) &&
+        incoming().updatedAt == request.time &&
+        isAdmin();
+      allow update: if isVerifiedUser() && isValidId(accountId) &&
+        isValidCloudManagedAccountDoc(incoming(), accountId) &&
+        incoming().accountId == existing().accountId &&
+        incoming().syncScope == existing().syncScope &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'authMode', 'managerName', 'deviceLabel', 'fc', 'bp', 'starPoints', 'nextCardSerial',
+          'vipPoints', 'vipLevel', 'foosballLoops', 'foosballSpins', 'foosballJackpotFc',
+          'squadValue', 'bestCardOvr', 'bestCardName', 'bestCardSeason', 'bestCardGrade',
+          'elo', 'wins', 'draws', 'losses', 'managerXp', 'squadOvr',
+          'packs', 'claimedMilestones', 'claimedVipRewards', 'claimedBroadcastIds',
+          'formation', 'activeTeamColorId', 'lineupSlotUids',
+          'isBanned', 'banReason', 'isDelegatedAdmin', 'adminRevision', 'updatedAt'
+        ]) &&
+        isAdmin();
+      allow delete: if isVerifiedUser() && isValidId(accountId) && isAdmin();
+
+      match /cards/{cardId} {
+        allow get: if isValidId(accountId) && isValidId(cardId) &&
+          (resource == null || (existing().accountId == accountId && existing().syncScope == 'GLOBAL')) &&
+          isParentCloudManagedDocValid(accountId);
+        allow list: if resource.data.accountId == accountId && resource.data.syncScope == 'GLOBAL';
+        allow create: if isVerifiedUser() && isValidId(accountId) && isValidId(cardId) &&
+          isValidCloudManagedCardDoc(incoming(), accountId) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          isAdmin() &&
+          isParentCloudManagedDocValid(accountId);
+        allow update: if isVerifiedUser() && isValidId(accountId) && isValidId(cardId) &&
+          isValidCloudManagedCardDoc(incoming(), accountId) &&
+          incoming().accountId == existing().accountId &&
+          incoming().syncScope == existing().syncScope &&
+          incoming().templateId == existing().templateId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'grade', 'ovr', 'valueBp', 'customMinifaceUrl', 'serialNumber', 'updatedAt'
+          ]) &&
+          isAdmin() &&
+          isParentCloudManagedDocValid(accountId);
+        allow delete: if isVerifiedUser() && isValidId(accountId) && isValidId(cardId) &&
+          existing().accountId == accountId &&
+          isAdmin();
+      }
+    }
+
+    match /leaderboard_entries/{userId} {
+      allow get: if isValidId(userId) && (resource == null || existing().boardScope == 'GLOBAL');
+      allow list: if resource.data.boardScope == 'GLOBAL';
+      allow create: if isVerifiedUser() && isValidId(userId) &&
+        isValidLeaderboardEntry(incoming(), userId) &&
+        incoming().updatedAt == request.time && (
+          (userId == request.auth.uid && isParentUserDocValid(userId)) ||
+          (isAdmin() && (isParentUserDocValid(userId) || isParentCloudManagedDocValid(userId)))
+        );
+      allow update: if isVerifiedUser() && isValidId(userId) &&
+        isValidLeaderboardEntry(incoming(), userId) &&
+        incoming().ownerId == existing().ownerId &&
+        incoming().boardScope == existing().boardScope &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'managerName', 'vipLevel', 'vipPoints', 'squadValue',
+          'bestCardOvr', 'bestCardName', 'bestCardSeason', 'bestCardGrade',
+          'elo', 'wins', 'draws', 'losses', 'managerLevel', 'squadOvr', 'deviceLabel',
+          'updatedAt'
+        ]) && (
+          (userId == request.auth.uid && isParentUserDocValid(userId)) ||
+          (isAdmin() && (isParentUserDocValid(userId) || isParentCloudManagedDocValid(userId)))
+        );
+      allow delete: if isVerifiedUser() && isValidId(userId) && isAdmin();
+    }
+  }
+}
